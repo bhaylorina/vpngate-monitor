@@ -1,63 +1,98 @@
 {
  "meta": {
-  "fetched_at": "2026-11-19T18:30:09Z",
+  "fetched_at": "2026-11-19T18:37:28Z",
   "source": "https://www.vpngate.net/api/iphone/",
   "http_status": 200,
-  "raw_bytes": 1293425,
-  "sha256": "3250e87c4896958655624a16ff26999e3f600eea367d65a47f6b953331e43b6f",
-  "duration_s": 6.62,
-  "rows_parsed": 96,
+  "raw_bytes": 1266340,
+  "sha256": "519bda3af5535d7306f1bade48b97a0d360ca157da1648e6714507d44847bb2b",
+  "duration_s": 7.17,
+  "rows_parsed": 94,
   "rows_malformed": 0,
   "rows_cleaned": 93,
-  "rows_dropped_invalid": 3,
+  "rows_dropped_invalid": 1,
   "removed_exact_duplicates": 0,
-  "removed_same_ip_duplicates": 0,
-  "unique_servers": 93,
-  "with_endpoint": 93,
-  "registry_size": 1267,
-  "test_plan_size": 1267,
-  "test_plan_current": 93,
+  "removed_same_ip_duplicates": 4,
+  "unique_servers": 89,
+  "with_endpoint": 89,
+  "registry_size": 1319,
+  "test_plan_size": 1319,
+  "test_plan_current": 89,
   "recall_days": 30
  },
- "fetched": 93,
- "tested": 8,
- "alive": 2,
- "dead": 6,
- "untested": 1259,
- "alive_pct": 25.0,
+ "fetched": 89,
+ "tested": 10,
+ "alive": 7,
+ "dead": 3,
+ "untested": 1309,
+ "alive_pct": 70.0,
  "usability": 0.0,
- "avg_mbps": 15.46,
- "median_mbps": 16.43,
- "max_mbps": 16.43,
+ "avg_mbps": 12.427142857142856,
+ "median_mbps": 13.47,
+ "max_mbps": 16.11,
  "mismatches": 0,
- "historical_known": 1174,
- "revived": 2,
- "avg_connect_ms": 2503.5,
+ "historical_known": 1230,
+ "revived": 7,
+ "avg_connect_ms": 2966.714285714286,
  "fastest": [
+  {
+   "HostName": "fallback-18520-udp",
+   "IP": "49.205.119.53",
+   "CountryShort": "IN",
+   "in_current_list": false,
+   "download_mbps": 16.11
+  },
   {
    "HostName": "vpn241710487-udp",
    "IP": "49.205.119.53",
    "CountryShort": "IN",
    "in_current_list": false,
-   "download_mbps": 16.43
+   "download_mbps": 15.92
+  },
+  {
+   "HostName": "fallback-1195-udp",
+   "IP": "103.172.220.133",
+   "CountryShort": "IN",
+   "in_current_list": false,
+   "download_mbps": 14.67
   },
   {
    "HostName": "vpn359610091-udp",
    "IP": "103.172.220.133",
    "CountryShort": "IN",
    "in_current_list": false,
-   "download_mbps": 14.49
+   "download_mbps": 13.47
+  },
+  {
+   "HostName": "fallback-995-tcp",
+   "IP": "103.172.220.133",
+   "CountryShort": "IN",
+   "in_current_list": false,
+   "download_mbps": 9.73
+  },
+  {
+   "HostName": "vpn359610091-tcp",
+   "IP": "103.172.220.133",
+   "CountryShort": "IN",
+   "in_current_list": false,
+   "download_mbps": 9.21
+  },
+  {
+   "HostName": "vpn359610091",
+   "IP": "103.172.220.133",
+   "CountryShort": "IN",
+   "in_current_list": false,
+   "download_mbps": 7.88
   }
  ],
  "failure_breakdown": {
-  "auth_failed": 3,
-  "connect_timeout": 3
+  "tls_handshake_failed": 2,
+  "connect_timeout": 1
  },
- "runner_ip": "20.64.174.76",
+ "runner_ip": "20.29.63.103",
  "run": {
-  "number": "4",
-  "url": "https://github.com/bhaylorina/vpngate-monitor/actions/runs/44588389829",
+  "number": "5",
+  "url": "https://github.com/bhaylorina/vpngate-monitor/actions/runs/44589684322",
   "event": "workflow_dispatch",
-  "generated_at": "2026-11-19T18:30:34Z"
+  "generated_at": "2026-11-19T18:38:19Z"
  }
 }
