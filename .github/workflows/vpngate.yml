@@ -1,25 +1,18 @@
-name: VPN Gate Monitor
+name: VPN Gate Monitor (India Only)
 
 on:
   schedule:
-    - cron: "23 3 * * *" # daily at 03:23 UTC (off-peak minute — top-of-hour slots get delayed/dropped by Actions congestion)
+    - cron: "0 */6 * * *" # Har 6 ghante mein India servers check karega
   workflow_dispatch:
     inputs:
       max_servers:
-        description: "Max servers to test (0 = all of them, always)"
+        description: "Max servers to test (0 = all India servers)"
         required: false
         default: "0"
       workers:
         description: "Parallel isolated OpenVPN tunnels"
         required: false
-        default: "48"
-  push:
-    branches: [main]
-    paths:
-      - "scripts/**"
-      - "tests/**"
-      - ".github/workflows/vpngate.yml"
-      - "requirements.txt"
+        default: "20"
 
 permissions:
   contents: write
@@ -30,9 +23,9 @@ concurrency:
 
 jobs:
   monitor:
-    name: "Fetch > Log > Clean > Dedupe > Archive > Test > Report"
+    name: "Fetch > Filter India (IN) > Test > Build fallback_india.ovpn"
     runs-on: ubuntu-latest
-    timeout-minutes: 110
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -46,29 +39,26 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq openvpn
-          openvpn --version | head -1
           python -m pip install --upgrade -q pip
-          python -m pip install -q -r requirements.txt pytest
+          python -m pip install -q requests pytest
 
-      - name: Unit tests (parser / cleaner / dedupe)
-        run: python -m pytest tests -q
-
-      - name: "Stages 1-5: fetch, log, clean, dedupe, archive"
+      - name: "Stages 1-5: fetch, import India history, clean, archive"
         shell: bash
         run: |
           mkdir -p logs
           python scripts/fetch.py --data-dir data --archive-dir archive 2>&1 | tee logs/fetch.log
 
-      - name: "Stage 6: test the VPNs (REAL OpenVPN tunnels to every server)"
+      - name: "Stage 6: test ONLY INDIA (IN) VPNs & build fallback_india.ovpn"
         shell: bash
         run: |
           sudo python3 scripts/test_vpns.py \
             --data-dir data \
-            --workers "${{ github.event.inputs.workers || '48' }}" \
+            --countries "IN" \
+            --workers "${{ github.event.inputs.workers || '20' }}" \
             --max-servers "${{ github.event.inputs.max_servers || '0' }}" \
             2>&1 | tee logs/test.log
 
-      - name: "Stage 7: generate report (README, badges, history)"
+      - name: "Stage 7: generate report"
         shell: bash
         env:
           GH_RUN_ID: ${{ github.run_id }}
@@ -80,32 +70,18 @@ jobs:
         run: |
           python scripts/report.py --data-dir data 2>&1 | tee logs/report.log
 
-      - name: Commit and push results
+      - name: Commit and push results (including fallback_india.ovpn)
         env:
           GIT_TERMINAL_PROMPT: 0
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A data archive badges README.md
+          [ -f fallback_india.ovpn ] && git add fallback_india.ovpn
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "chore(report): automated run #${{ github.run_number }} [skip ci]"
+            git commit -m "chore(india-vpn): updated active India servers #${{ github.run_number }} [skip ci]"
             git pull --rebase --autostash || true
             git push || (sleep 5 && git pull --rebase --autostash && git push)
           fi
-
-      - name: Upload run artifacts (logs, raw CSV, full results)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: vpngate-run-${{ github.run_number }}
-          path: |
-            logs
-            data/summary.json
-            data/results.json
-            data/servers_clean.csv
-            data/latest.json
-            data/raw/latest.csv
-          retention-days: 30
-          if-no-files-found: warn
