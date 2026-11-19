@@ -63,6 +63,33 @@ def try_fetch(timeout: int):
     return None, None, None, last_err
 
 
+def make_reg_entry(host: str, ip: str, proto: str, port: int, now: str, base: dict | None = None) -> dict:
+    """Create a schema-complete registry entry with guaranteed integer fields for report.py."""
+    b = base or {}
+    entry = {
+        "HostName": host,
+        "IP": ip,
+        "Score": int(b.get("Score") or 150000),
+        "Ping": int(b.get("Ping") or 15),
+        "Speed": int(b.get("Speed") or 10000000),
+        "CountryLong": b.get("CountryLong") or "India",
+        "CountryShort": "IN",
+        "NumVpnSessions": int(b.get("NumVpnSessions") or 1),
+        "Uptime": int(b.get("Uptime") or 3600000),
+        "TotalUsers": int(b.get("TotalUsers") or 100),
+        "TotalTraffic": int(b.get("TotalTraffic") or 1000000),
+        "LogType": b.get("LogType") or "2weeks",
+        "Operator": b.get("Operator") or "India Volunteer",
+        "Message": b.get("Message") or "",
+        "proto": proto.lower(),
+        "port": int(port),
+        "first_seen": b.get("first_seen") or now,
+        "last_seen": now,
+        "occurrences": int(b.get("occurrences") or 1),
+    }
+    return entry
+
+
 def inject_extra_india_servers(reg: dict, now: str):
     """Pull historical & hidden India (IN) servers from external sources and local fallback_india.ovpn."""
     added = 0
@@ -85,18 +112,7 @@ def inject_extra_india_servers(reg: dict, now: str):
                     if ip and port:
                         key = f"{host}|{ip}"
                         if key not in reg:
-                            reg[key] = {
-                                **{f: srv.get(f, "") for f in common.PUBLIC_FIELDS},
-                                "HostName": host,
-                                "IP": ip,
-                                "CountryShort": "IN",
-                                "CountryLong": "India",
-                                "proto": pr,
-                                "port": int(port),
-                                "first_seen": now,
-                                "last_seen": now,
-                                "occurrences": 1,
-                            }
+                            reg[key] = make_reg_entry(host, ip, pr, int(port), now, srv)
                             added += 1
     except Exception as e:  # noqa: BLE001
         plog(f"external latest.json India import skipped: {e}")
@@ -121,38 +137,12 @@ def inject_extra_india_servers(reg: dict, now: str):
                         if ip and tcp_p and tcp_p != "0":
                             k_tcp = f"{host_label}-tcp|{ip}"
                             if k_tcp not in reg:
-                                reg[k_tcp] = {
-                                    "HostName": f"{host_label}-tcp",
-                                    "IP": ip,
-                                    "Score": 200000,
-                                    "Ping": 15,
-                                    "Speed": 10000000,
-                                    "CountryLong": "India",
-                                    "CountryShort": "IN",
-                                    "proto": "tcp",
-                                    "port": int(tcp_p),
-                                    "first_seen": now,
-                                    "last_seen": now,
-                                    "occurrences": 1,
-                                }
+                                reg[k_tcp] = make_reg_entry(f"{host_label}-tcp", ip, "tcp", int(tcp_p), now)
                                 added += 1
                         if ip and udp_p and udp_p != "0":
                             k_udp = f"{host_label}-udp|{ip}"
                             if k_udp not in reg:
-                                reg[k_udp] = {
-                                    "HostName": f"{host_label}-udp",
-                                    "IP": ip,
-                                    "Score": 200000,
-                                    "Ping": 15,
-                                    "Speed": 10000000,
-                                    "CountryLong": "India",
-                                    "CountryShort": "IN",
-                                    "proto": "udp",
-                                    "port": int(udp_p),
-                                    "first_seen": now,
-                                    "last_seen": now,
-                                    "occurrences": 1,
-                                }
+                                reg[k_udp] = make_reg_entry(f"{host_label}-udp", ip, "udp", int(udp_p), now)
                                 added += 1
     except Exception as e:  # noqa: BLE001
         plog(f"HTML India scrape skipped: {e}")
@@ -172,25 +162,20 @@ def inject_extra_india_servers(reg: dict, now: str):
                 pr = (m.group(3) or "tcp").lower()
                 key = f"fallback-{p}-{pr}|{h_or_ip}"
                 if key not in reg:
-                    reg[key] = {
-                        "HostName": f"fallback-{p}-{pr}",
-                        "IP": h_or_ip,
-                        "Score": 150000,
-                        "Ping": 10,
-                        "Speed": 10000000,
-                        "CountryLong": "India",
-                        "CountryShort": "IN",
-                        "proto": pr,
-                        "port": p,
-                        "first_seen": now,
-                        "last_seen": now,
-                        "occurrences": 1,
-                    }
+                    reg[key] = make_reg_entry(f"fallback-{p}-{pr}", h_or_ip, pr, p, now)
                     added += 1
                 else:
                     reg[key]["last_seen"] = now
         except Exception as e:  # noqa: BLE001
             plog(f"fallback_india.ovpn import error: {e}")
+
+    # 4. Sanitize all registry entries so INT_FIELDS are always valid integers
+    for entry in reg.values():
+        for int_f in common.INT_FIELDS:
+            try:
+                entry[int_f] = int(entry.get(int_f) or 0)
+            except (ValueError, TypeError):
+                entry[int_f] = 0
 
     if added:
         plog(f"India Booster added {added} extra Indian server endpoints to registry")
