@@ -7,6 +7,7 @@ import base64
 import hashlib
 import os
 import re
+import socket
 import sys
 import time
 
@@ -66,7 +67,7 @@ def try_fetch(timeout: int):
 def make_reg_entry(host: str, ip: str, proto: str, port: int, now: str, base: dict | None = None) -> dict:
     """Create a schema-complete registry entry with guaranteed integer fields for report.py."""
     b = base or {}
-    entry = {
+    return {
         "HostName": host,
         "IP": ip,
         "Score": int(b.get("Score") or 150000),
@@ -87,12 +88,57 @@ def make_reg_entry(host: str, ip: str, proto: str, port: int, now: str, base: di
         "last_seen": now,
         "occurrences": int(b.get("occurrences") or 1),
     }
-    return entry
+
+
+def resolve_ddns_ip(hostname: str, fallback_ip: str) -> str:
+    """If hostname is vpnXXXX, resolve vpnXXXX.opengw.net to get its latest dynamic IP."""
+    clean_h = re.sub(r"-(tcp|udp)$", "", hostname.strip(), flags=re.IGNORECASE)
+    if clean_h.startswith("vpn") and clean_h[3:].isdigit():
+        ddns = f"{clean_h}.opengw.net"
+        try:
+            new_ip = socket.gethostbyname(ddns)
+            if common.valid_ipv4(new_ip):
+                return new_ip
+        except Exception:  # noqa: BLE001
+            pass
+    return fallback_ip
 
 
 def inject_extra_india_servers(reg: dict, now: str):
-    """Pull historical & hidden India (IN) servers from external sources and local fallback_india.ovpn."""
+    """Pull historical & hidden India (IN) servers, deduplicate by (IP, port, proto), and refresh DDNS IPs."""
+    # Step 0: Remove old synthetic duplicate keys (fallback-*, *-tcp, *-udp) if real entry exists
+    stale_keys = [k for k in reg if k.startswith("fallback-")]
+    for k in stale_keys:
+        del reg[k]
+
+    # Refresh DDNS IPs for existing Indian servers in registry
+    for k, v in list(reg.items()):
+        if (v.get("CountryShort") or "").upper() == "IN":
+            fresh_ip = resolve_ddns_ip(v.get("HostName", ""), v.get("IP", ""))
+            if fresh_ip != v.get("IP"):
+                plog(f"DDNS IP updated for {v.get('HostName')}: {v.get('IP')} -> {fresh_ip}")
+                v["IP"] = fresh_ip
+
+    # Track already-known (ip, port, proto) so we never add duplicates!
+    seen_endpoints = {
+        (v.get("IP"), int(v.get("port") or 0), (v.get("proto") or "tcp").lower())
+        for v in reg.values()
+        if v.get("IP") and v.get("port")
+    }
     added = 0
+
+    def add_unique(host: str, ip: str, proto: str, port: int, base: dict | None = None):
+        nonlocal added
+        proto = proto.lower()
+        port = int(port)
+        ip = resolve_ddns_ip(host, ip)
+        ep = (ip, port, proto)
+        if ep in seen_endpoints:
+            return
+        seen_endpoints.add(ep)
+        key = f"{host}|{ip}"
+        reg[key] = make_reg_entry(host, ip, proto, port, now, base)
+        added += 1
 
     # 1. Pull from onlyactions/vpngate-monitor latest.json
     try:
@@ -110,10 +156,7 @@ def inject_extra_india_servers(reg: dict, now: str):
                     port = via.split(":")[1] if ":" in via else (srv.get("port") or srv.get("Port"))
                     host = srv.get("HostName") or f"india-{ip}"
                     if ip and port:
-                        key = f"{host}|{ip}"
-                        if key not in reg:
-                            reg[key] = make_reg_entry(host, ip, pr, int(port), now, srv)
-                            added += 1
+                        add_unique(host, ip, pr, int(port), srv)
     except Exception as e:  # noqa: BLE001
         plog(f"external latest.json India import skipped: {e}")
 
@@ -135,19 +178,13 @@ def inject_extra_india_servers(reg: dict, now: str):
                     for fqdn, ip, tcp_p, udp_p in links:
                         host_label = fqdn.split(".")[0] if fqdn else f"india-{ip}"
                         if ip and tcp_p and tcp_p != "0":
-                            k_tcp = f"{host_label}-tcp|{ip}"
-                            if k_tcp not in reg:
-                                reg[k_tcp] = make_reg_entry(f"{host_label}-tcp", ip, "tcp", int(tcp_p), now)
-                                added += 1
+                            add_unique(f"{host_label}-tcp", ip, "tcp", int(tcp_p))
                         if ip and udp_p and udp_p != "0":
-                            k_udp = f"{host_label}-udp|{ip}"
-                            if k_udp not in reg:
-                                reg[k_udp] = make_reg_entry(f"{host_label}-udp", ip, "udp", int(udp_p), now)
-                                added += 1
+                            add_unique(f"{host_label}-udp", ip, "udp", int(udp_p))
     except Exception as e:  # noqa: BLE001
         plog(f"HTML India scrape skipped: {e}")
 
-    # 3. Import existing servers from fallback_india.ovpn so they also get tested
+    # 3. Import any genuinely new server from fallback_india.ovpn (only if not already in registry)
     if os.path.exists("fallback_india.ovpn"):
         try:
             with open("fallback_india.ovpn", "r", encoding="utf-8", errors="ignore") as f:
@@ -160,25 +197,29 @@ def inject_extra_india_servers(reg: dict, now: str):
                 h_or_ip = m.group(1)
                 p = int(m.group(2))
                 pr = (m.group(3) or "tcp").lower()
-                key = f"fallback-{p}-{pr}|{h_or_ip}"
-                if key not in reg:
-                    reg[key] = make_reg_entry(f"fallback-{p}-{pr}", h_or_ip, pr, p, now)
-                    added += 1
-                else:
-                    reg[key]["last_seen"] = now
+                add_unique(f"india-{p}-{pr}", h_or_ip, pr, p)
         except Exception as e:  # noqa: BLE001
             plog(f"fallback_india.ovpn import error: {e}")
 
-    # 4. Sanitize all registry entries so INT_FIELDS are always valid integers
-    for entry in reg.values():
+    # 4. Deduplicate existing registry entries that share the exact same (IP, port, proto)
+    unique_reg = {}
+    ep_seen = set()
+    for k, v in reg.items():
+        if (v.get("CountryShort") or "").upper() == "IN":
+            ep = (v.get("IP"), int(v.get("port") or 0), (v.get("proto") or "tcp").lower())
+            if ep in ep_seen:
+                continue
+            ep_seen.add(ep)
         for int_f in common.INT_FIELDS:
             try:
-                entry[int_f] = int(entry.get(int_f) or 0)
+                v[int_f] = int(v.get(int_f) or 0)
             except (ValueError, TypeError):
-                entry[int_f] = 0
+                v[int_f] = 0
+        unique_reg[k] = v
 
-    if added:
-        plog(f"India Booster added {added} extra Indian server endpoints to registry")
+    reg.clear()
+    reg.update(unique_reg)
+    plog(f"India Booster complete (added {added} new endpoints, deduplicated registry)")
 
 
 def main() -> int:
@@ -267,7 +308,7 @@ def main() -> int:
     now = common.now_iso()
     common.update_registry(reg, kept, now)
 
-    # Run India Booster to inject hidden/historical Indian servers
+    # Run India Booster to inject hidden/historical Indian servers & deduplicate
     inject_extra_india_servers(reg, now)
 
     dropped = common.prune_registry(reg, args.recall_days)
