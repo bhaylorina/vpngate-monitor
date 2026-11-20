@@ -1,21 +1,21 @@
 {
  "meta": {
-  "fetched_at": "2026-11-20T05:26:14Z",
+  "fetched_at": "2026-11-20T07:52:10Z",
   "source": "https://www.vpngate.net/api/iphone/",
   "http_status": 200,
-  "raw_bytes": 1293360,
-  "sha256": "52103ff572ac1e9947acf54350cddcc1658fa267ac9ab9df901aac1822ecd0a0",
-  "duration_s": 1.76,
-  "rows_parsed": 96,
+  "raw_bytes": 1306705,
+  "sha256": "ce3d92f66bf148a0c7efb022f8cee393ebe8967c350f938f2ba2a7f44baf9e46",
+  "duration_s": 1.78,
+  "rows_parsed": 97,
   "rows_malformed": 0,
   "rows_cleaned": 95,
-  "rows_dropped_invalid": 1,
+  "rows_dropped_invalid": 2,
   "removed_exact_duplicates": 0,
   "removed_same_ip_duplicates": 2,
   "unique_servers": 93,
   "with_endpoint": 93,
-  "registry_size": 1499,
-  "test_plan_size": 1499,
+  "registry_size": 1554,
+  "test_plan_size": 1554,
   "test_plan_current": 93,
   "recall_days": 30
  },
@@ -23,47 +23,47 @@
  "tested": 4,
  "alive": 3,
  "dead": 1,
- "untested": 1495,
+ "untested": 1550,
  "alive_pct": 75.0,
  "usability": 0.0,
- "avg_mbps": 9.286666666666667,
- "median_mbps": 10.73,
- "max_mbps": 11.11,
+ "avg_mbps": 8.200000000000001,
+ "median_mbps": 10.54,
+ "max_mbps": 11.64,
  "mismatches": 0,
- "historical_known": 1406,
+ "historical_known": 1461,
  "revived": 3,
- "avg_connect_ms": 3670.0,
+ "avg_connect_ms": 3504.0,
  "fastest": [
-  {
-   "HostName": "vpn368881682",
-   "IP": "106.51.189.183",
-   "CountryShort": "IN",
-   "in_current_list": false,
-   "download_mbps": 11.11
-  },
   {
    "HostName": "vpn359610091-udp",
    "IP": "103.172.220.133",
    "CountryShort": "IN",
    "in_current_list": false,
-   "download_mbps": 10.73
+   "download_mbps": 11.64
+  },
+  {
+   "HostName": "vpn368881682",
+   "IP": "106.51.189.183",
+   "CountryShort": "IN",
+   "in_current_list": false,
+   "download_mbps": 10.54
   },
   {
    "HostName": "vpn359610091",
    "IP": "103.172.220.133",
    "CountryShort": "IN",
    "in_current_list": false,
-   "download_mbps": 6.02
+   "download_mbps": 2.42
   }
  ],
  "failure_breakdown": {
   "tls_handshake_failed": 1
  },
- "runner_ip": "40.124.234.76",
+ "runner_ip": "132.196.82.136",
  "run": {
-  "number": "9",
-  "url": "https://github.com/bhaylorina/vpngate-monitor/actions/runs/44680980547",
-  "event": "schedule",
-  "generated_at": "2026-11-20T05:26:47Z"
+  "number": "10",
+  "url": "https://github.com/bhaylorina/vpngate-monitor/actions/runs/44698081671",
+  "event": "workflow_dispatch",
+  "generated_at": "2026-11-20T07:52:43Z"
  }
 }
