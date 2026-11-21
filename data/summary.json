@@ -1,63 +1,57 @@
 {
  "meta": {
-  "fetched_at": "2026-11-21T14:03:52Z",
+  "fetched_at": "2026-11-21T16:57:25Z",
   "source": "https://www.vpngate.net/api/iphone/",
   "http_status": 200,
-  "raw_bytes": 1320478,
-  "sha256": "5e078cebd4502345978b60441f4efce6dfea8756ee575d59e2cd2258938a68f7",
-  "duration_s": 1.48,
+  "raw_bytes": 1320550,
+  "sha256": "97c43d174b5781b502fe03af8f1d37ef0bf10fe75bbe7f90dfc5890abc9718f7",
+  "duration_s": 5.76,
   "rows_parsed": 98,
   "rows_malformed": 0,
-  "rows_cleaned": 95,
-  "rows_dropped_invalid": 3,
+  "rows_cleaned": 97,
+  "rows_dropped_invalid": 1,
   "removed_exact_duplicates": 0,
   "removed_same_ip_duplicates": 1,
-  "unique_servers": 94,
-  "with_endpoint": 94,
-  "registry_size": 1974,
-  "test_plan_size": 1974,
-  "test_plan_current": 94,
+  "unique_servers": 96,
+  "with_endpoint": 96,
+  "registry_size": 2022,
+  "test_plan_size": 2022,
+  "test_plan_current": 96,
   "recall_days": 30
  },
- "fetched": 94,
+ "fetched": 96,
  "tested": 6,
- "alive": 2,
- "dead": 4,
- "untested": 1968,
- "alive_pct": 33.333333333333336,
+ "alive": 1,
+ "dead": 5,
+ "untested": 2016,
+ "alive_pct": 16.666666666666668,
  "usability": 0.0,
- "avg_mbps": 14.175,
- "median_mbps": 15.78,
- "max_mbps": 15.78,
+ "avg_mbps": 16.3,
+ "median_mbps": 16.3,
+ "max_mbps": 16.3,
  "mismatches": 0,
- "historical_known": 1880,
- "revived": 2,
- "avg_connect_ms": 3006.0,
+ "historical_known": 1926,
+ "revived": 1,
+ "avg_connect_ms": 2752.0,
  "fastest": [
   {
    "HostName": "vpn340566993-udp",
    "IP": "202.141.43.203",
    "CountryShort": "IN",
    "in_current_list": false,
-   "download_mbps": 15.78
-  },
-  {
-   "HostName": "vpn368881682",
-   "IP": "106.51.189.183",
-   "CountryShort": "IN",
-   "in_current_list": false,
-   "download_mbps": 12.57
+   "download_mbps": 16.3
   }
  ],
  "failure_breakdown": {
   "auth_failed": 2,
-  "tls_handshake_failed": 2
+  "tls_handshake_failed": 2,
+  "connect_timeout": 1
  },
- "runner_ip": "128.85.54.19",
+ "runner_ip": "20.119.95.130",
  "run": {
-  "number": "19",
-  "url": "https://github.com/bhaylorina/vpngate-monitor/actions/runs/44911927946",
-  "event": "schedule",
-  "generated_at": "2026-11-21T14:04:25Z"
+  "number": "20",
+  "url": "https://github.com/bhaylorina/vpngate-monitor/actions/runs/44927323806",
+  "event": "workflow_dispatch",
+  "generated_at": "2026-11-21T16:58:09Z"
  }
 }
