@@ -14,35 +14,48 @@
 
 | | |
 |---|---|
-| **Run** | [#33 · view run](https://github.com/bhaylorina/vpngate-monitor/actions/runs/45922480717) · 2026-11-27 01:25:47 UTC · trigger: `schedule` |
-| **Servers fetched (unique)** | **92** |
+| **Run** | [#34 · view run](https://github.com/bhaylorina/vpngate-monitor/actions/runs/46029713214) · 2026-11-27 15:59:51 UTC · trigger: `schedule` |
+| **Servers fetched (unique)** | **99** |
 | **Duplicates removed** | 0 exact + 0 same-IP |
-| **Servers tested** | **10 of 2,676** — all 92 current + 2,584 historical (every server seen in the API within 30 days) |
-| **✅ Verified alive** (tunnel up + egress proven) | **0** — 0 from the current list + 0 historical ♻️ |
-| **❌ Dead / unusable** | 10 |
+| **Servers tested** | **12 of 2,727** — all 99 current + 2,628 historical (every server seen in the API within 30 days) |
+| **✅ Verified alive** (tunnel up + egress proven) | **3** — 0 from the current list + 3 historical ♻️ |
+| **❌ Dead / unusable** | 9 |
 | **Usability** | **0.0%** of everything VPN Gate lists right now actually works |
+| **⚡ Measured speed (avg / median / max)** | **13.5 / 14.1 / 15.9 Mbps** |
+| **🚀 Fastest verified** | **vpn410023160-udp** · 🇮🇳 India · **15.9 Mbps** |
 | **🧭 Exit-country mismatches** | 0 (server exits somewhere else than it claims) |
-| **Untested** | 2,666 |
+| **🤝 Handshake time (alive, avg)** | 3.2 s |
+| **Untested** | 2,715 |
 
 ## 🚀 Fastest verified servers
 
-⏳ No verified-alive servers yet — waiting for the first completed test run.
+| # | Server | Country | List | Endpoint | Handshake | Measured ↓ | Claimed ↓ | Score |
+|---:|---|---|---|---|---:|---:|---:|---:|
+| 1 | `vpn410023160-udp` | 🇮🇳 India | ♻️ historical | `49.207.56.172:8368`/udp | 2.8s | **15.9 Mbps** | 10.0 Mbps | 150,000 |
+| 2 | `vpn359610091-udp` | 🇮🇳 India | ♻️ historical | `103.172.220.133:1195`/udp | 2.5s | **14.1 Mbps** | 10.0 Mbps | 150,000 |
+| 3 | `vpn359610091` | 🇮🇳 India | ♻️ historical | `103.172.220.133:995`/tcp | 4.3s | **10.4 Mbps** | 7.6 Mbps | 1,215,566 |
+
+*Measured = 5 MB download through the live tunnel to speed.cloudflare.com. Claimed = the server's self-reported line speed in the VPN Gate API. 'Historical' servers are no longer in the API's current top list but still answered our tunnel — we keep re-testing everything we have ever seen.*
 
 ## ⭐ Top-scored & verified alive
 
-⏳ Pending first completed test run.
+| # | Server | Country | Score | Claimed ↓ | Measured ↓ | Sessions | Uptime | Log policy |
+|---:|---|---|---:|---:|---:|---:|---:|---|
+| 1 | `vpn359610091` | 🇮🇳 IN | 1,215,566 | 7.6 Mbps | 10.4 Mbps | 74 | 40.0 d | 2weeks |
+| 2 | `vpn410023160-udp` | 🇮🇳 IN | 150,000 | 10.0 Mbps | 15.9 Mbps | 1 | 1.0 h | 2weeks |
+| 3 | `vpn359610091-udp` | 🇮🇳 IN | 150,000 | 10.0 Mbps | 14.1 Mbps | 1 | 1.0 h | 2weeks |
 
 ## 🌍 Countries
 
 | Country | Servers | Verified alive | Best measured ↓ | Fastest server |
 |---|---:|---:|---:|---|
-| 🇯🇵 Japan (JP) | 1,102 | 0 | 0.0 Mbps | `` |
-| 🇰🇷 Korea Republic of (KR) | 903 | 0 | 0.0 Mbps | `` |
-| 🇷🇺 Russian Federation (RU) | 240 | 0 | 0.0 Mbps | `` |
-| 🇹🇭 Thailand (TH) | 162 | 0 | 0.0 Mbps | `` |
-| 🇺🇸 United States (US) | 69 | 0 | 0.0 Mbps | `` |
+| 🇯🇵 Japan (JP) | 1,115 | 0 | 0.0 Mbps | `` |
+| 🇰🇷 Korea Republic of (KR) | 922 | 0 | 0.0 Mbps | `` |
+| 🇷🇺 Russian Federation (RU) | 249 | 0 | 0.0 Mbps | `` |
+| 🇹🇭 Thailand (TH) | 166 | 0 | 0.0 Mbps | `` |
+| 🇺🇸 United States (US) | 73 | 0 | 0.0 Mbps | `` |
 | 🇻🇳 Viet Nam (VN) | 51 | 0 | 0.0 Mbps | `` |
-| 🇮🇳 India (IN) | 17 | 0 | 0.0 Mbps | `` |
+| 🇮🇳 India (IN) | 19 | 3 | 15.9 Mbps | `vpn410023160-udp` |
 | 🇦🇺 Australia (AU) | 12 | 0 | 0.0 Mbps | `` |
 | 🇬🇧 United Kingdom (GB) | 10 | 0 | 0.0 Mbps | `` |
 | 🇭🇷 Croatia (LOCAL Name: Hrvatska) (HR) | 10 | 0 | 0.0 Mbps | `` |
@@ -80,7 +93,15 @@
 
 ## 🕵️ Claim vs. reality
 
-⏳ Pending first completed test run.
+The VPN Gate `Speed` field is whatever the server *claims*. Here is the truth, measured through a live tunnel — the hall of shame (claimed ≫ delivered):
+
+| Server | Country | Claims | Delivers | Reality ratio |
+|---|---|---:|---:|---:|
+| `vpn359610091` | 🇮🇳 IN | 8 Mbps | 10.4 Mbps | 136% |
+| `vpn359610091-udp` | 🇮🇳 IN | 10 Mbps | 14.1 Mbps | 141% |
+| `vpn410023160-udp` | 🇮🇳 IN | 10 Mbps | 15.9 Mbps | 159% |
+
+Most honest of this round: `vpn410023160-udp` (16 Mbps), `vpn359610091-udp` (14 Mbps), `vpn359610091` (10 Mbps).
 
 ## 🧭 Exit-country mismatches
 
@@ -88,12 +109,13 @@
 
 ## 📈 History
 
-Alive % trend (last 56 runs): `██▇▆▆▃▅▆▅▅▅█▅▅▅▅▅▅▅▅▅▅▅▄▅▄▃▃██▆█████▅▅█▄▄▁▄▂▅▅▆▅▄▄▄▃▃▃▁▃`
+Alive % trend (last 57 runs): `██▇▆▆▃▅▆▅▅▅█▅▅▅▅▅▅▅▅▅▅▅▄▅▄▃▃██▆█████▅▅█▄▄▁▄▂▅▅▆▅▄▄▄▃▃▃▁▃▁`
 
 Avg measured speed (Mbps): `▆▆▄▆▅▇▆▆▄▆▄▆▆▆▆▆▆██▆▆▇▆▇▆▅▅█▆▆▇▇▅▄▆▆▆█▆▆▆▇█▅▄▇█▇▂█▁▆▅▅`
 
 | Run at | Fetched | Alive | Alive % | Avg ↓ | Max ↓ | Mismatches |
 |---|---:|---:|---:|---:|---:|---:|
+| 2026-11-27 01:25:47 UTC | 92 | 0 | 0% | 0.0 | 0.0 | 0 |
 | 2026-11-26 16:14:58 UTC | 93 | 2 | 20% | 10.3 | 13.0 | 0 |
 | 2026-11-26 01:28:21 UTC | 92 | 0 | 0% | 0.0 | 0.0 | 0 |
 | 2026-11-25 16:41:31 UTC | 98 | 2 | 22% | 10.5 | 12.7 | 0 |
@@ -108,7 +130,6 @@ Avg measured speed (Mbps): `▆▆▄▆▅▇▆▆▄▆▄▆▆▆▆▆▆�
 | 2026-11-21 22:42:11 UTC | 92 | 3 | 43% | 9.3 | 15.8 | 0 |
 | 2026-11-21 16:57:25 UTC | 96 | 1 | 17% | 16.3 | 16.3 | 0 |
 | 2026-11-21 14:03:52 UTC | 94 | 2 | 33% | 14.2 | 15.8 | 0 |
-| 2026-11-21 05:17:36 UTC | 96 | 0 | 0% | 0.0 | 0.0 | 0 |
 
 ## ⚙️ How the pipeline works
 
@@ -172,4 +193,4 @@ Field units: `Score` points · `Ping` ms · `Speed` bit/s (self-reported) · `Up
 Code: MIT. Data: originates from VPN Gate's public API — respect their terms.
 
 ---
-*Auto-generated by [run #33](https://github.com/bhaylorina/vpngate-monitor/actions/runs/45922480717) at 2026-11-27 01:26:53 UTC. Next scheduled run: daily at 03:23 UTC.*
+*Auto-generated by [run #34](https://github.com/bhaylorina/vpngate-monitor/actions/runs/46029713214) at 2026-11-27 16:00:57 UTC. Next scheduled run: daily at 03:23 UTC.*

@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
  "label": "avg measured speed",
- "message": "pending",
- "color": "lightgrey"
+ "message": "13.5 Mbps",
+ "color": "yellowgreen"
 }
